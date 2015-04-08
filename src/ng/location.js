@@ -41,6 +41,15 @@ function parseAppUrl(relativeUrl, locationObj) {
       match.pathname.substring(1) : match.pathname);
   locationObj.$$search = parseKeyValue(match.search);
   locationObj.$$hash = decodeURIComponent(match.hash);
+  
+  // Patch from: https://github.com/angular/angular.js/issues/8905
+  // Detect Juniper re-write functions and handle the $$path issue
+  if(locationObj.$$path === "[object Object]" && typeof(DanaOrigUrl) === 'function') {
+    var __strH = 'href';
+    var __tmpHack = match[__strH];
+    var __nn = ("" + __tmpHack).match(/^(https?:\/\/[^\/]+)?([^?|#]*)/);
+    locationObj.$$path = __nn[2];
+  }
 
   // make sure path starts with '/';
   if (locationObj.$$path && locationObj.$$path.charAt(0) != '/') {
